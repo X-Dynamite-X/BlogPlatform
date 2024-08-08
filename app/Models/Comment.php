@@ -9,7 +9,7 @@ class Comment extends Model
 {
     use HasFactory;
     protected $fillable = [
-        'content', 'user_id', 'post_id',
+        'content', 'user_id', 'post_id' ,
     ];
 
     // العلاقة مع المستخدم: التعليق ينتمي إلى مستخدم

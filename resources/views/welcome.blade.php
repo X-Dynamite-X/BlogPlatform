@@ -5,6 +5,6 @@
     </head>
 
     <body>
-        <div id="app" class="pl-4 "></div>
+        <div id="app" class=""></div>
     </body>
 </html>

@@ -18,16 +18,13 @@ class Post extends Model
         return $this->belongsTo(User::class);
     }
 
-    // العلاقة مع التصنيف: المقال ينتمي إلى تصنيف
-    public function category()
-    {
-        return $this->belongsTo(Category::class);
-    }
-
-    // العلاقة مع التعليقات: المقال يحتوي على العديد من التعليقات
     public function comments()
     {
         return $this->hasMany(Comment::class);
+    }
+    public function category()
+    {
+        return $this->belongsTo(Category::class);
     }
 
     // العلاقة مع الوسوم: المقال يمكن أن يحتوي على العديد من الوسوم

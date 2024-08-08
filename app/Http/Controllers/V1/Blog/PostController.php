@@ -12,7 +12,7 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::all();
+        $posts = Post::all()->load("user");
         return response()->json([
             'message' => 'Posts fetched successfully',
             'posts' => $posts,
@@ -39,9 +39,13 @@ class PostController extends Controller
      */
     public function show(Post $post)
     {
+        // $post = $post->where("id","=",$post->id)->with(["category","tags"])->get();
+        // dd($post);
         return response()->json([
             'message' => 'Post fetched successfully',
-            'post' => $post,
+            'post' => $post->load(["category","user","tags"]),
+            "auth"=>auth()->user(),
+
         ]);
     }
 

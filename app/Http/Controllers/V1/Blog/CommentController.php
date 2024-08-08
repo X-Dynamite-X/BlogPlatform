@@ -16,7 +16,7 @@ class CommentController extends Controller
      */
     public function indexForPost(Post $post)
     {
-        $comments = $post->comments()->get();
+        $comments = $post->comments()->with('user')->get();
         return response()->json([
             'message' => 'Comments fetched successfully',
             'comments' => $comments,
@@ -26,25 +26,27 @@ class CommentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function storeForPost(Post $post,StoreCommentRequest $request)
+    public function storeForPost(Post $post, StoreCommentRequest $request)
     {
-        $data =  $request->safe()->merge([
-            'user_id' => auth()->id(),
-            "post_id"=>$post->id]);
-        $comment = Comment::create($data->all());
+        $data = $request->validated();
+        $data['user_id'] = auth()->id();
+        $data['post_id'] = $post->id;
+
+        $comment = Comment::create($data);
 
         return response()->json([
             'message' => 'Comment created successfully',
-            'comment' => $comment,
+            'comment' => $comment->load('user'),
         ]);
     }
 
     /**
      * Display the specified resource.
      */
-    public function showForPost(Post $post,Comment $comment)
+    public function showForPost(Post $post, Comment $comment)
     {
-        $comment = $post->comments()->get()->find($comment->id);
+        $comment = $post->comments()->where('id', $comment->id)->with('user')->firstOrFail();
+
         return response()->json([
             'message' => 'Comment fetched successfully',
             'comment' => $comment,
@@ -54,25 +56,32 @@ class CommentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function updateForPost(Post $post,UpdateCommentRequest $request, Comment $comment)
+    public function updateForPost(Post $post, UpdateCommentRequest $request, Comment $comment)
     {
-        $comment->update($request->safe()->all());
+        $this->authorize('update', $comment);
+
+        $comment->update($request->validated());
+
         return response()->json([
             'message' => 'Comment updated successfully',
-            'comment' => $comment,
+            'comment' => $comment->load('user'),
         ]);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroyForPost(Post $post,Comment $comment)
+    public function destroyForPost(Post $post, Comment $comment)
     {
-        if (auth()->id() !== $comment->user_id) {
-            return response()->json(['message' => 'Unauthorized'], 403);
-        }
+        $this->authorize('delete', $comment);
 
         $comment->delete();
-        return response()->json(['message' => 'Comment deleted successfully',"comments"=>$post->comments()->get()]);
+
+        $comments = $post->comments()->with('user')->get();
+
+        return response()->json([
+            'message' => 'Comment deleted successfully',
+            'comments' => $comments,
+        ]);
     }
 }
