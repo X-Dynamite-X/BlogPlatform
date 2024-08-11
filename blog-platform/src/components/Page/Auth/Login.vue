@@ -1,37 +1,13 @@
 <script setup>
-import { ref } from "vue";
-import axios from "axios";
-import { useRouter } from "vue-router";
-
-const form = ref({
-  email: "",
-  password: "",
-});
-
-const router = useRouter();
-
-const handleLogin = async () => {
-  try {
-    const response = await axios.post('/api/login', {
-      email: form.value.email,
-      password: form.value.password,
+    import { ref } from "vue";
+    import { useAuthStore } from '../../../stores/auth';
+    const  authStore = useAuthStore();
+    const login = authStore.handleLogin
+    const errors =authStore.authErrors
+    const form = ref({
+        email: "",
+        password: "",
     });
-
-    console.log(response.data.authorisation.token); // Access token from the 'authorisation' object
-    const token = response.data.authorisation.token; // Access token from the 'authorisation' object
-    const user = response.data.user; // User object
-
-    if (token) {
-      localStorage.setItem('token', token);
-      localStorage.setItem('user', JSON.stringify(user));
-      router.push("/");
-    } else {
-      console.error('Token not received');
-    }
-  } catch (error) {
-    console.error(error);
-  }
-};
 </script>
 
 
@@ -43,11 +19,15 @@ const handleLogin = async () => {
       </div>
 
       <div class="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
-        <form class="space-y-6" @submit.prevent="handleLogin" method="POST">
+        <form class="space-y-6" @submit.prevent="login(form)" method="POST">
           <div>
             <label for="email" class="block text-sm font-medium leading-6 text-gray-900">Email address</label>
             <div class="mt-2">
-              <input id="email" v-model="form.email" name="email" type="email" autocomplete="email" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+              <input id="email" placeholder="Email Address : " v-model="form.email" name="email" type="email" autocomplete="email" class="block p-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+            </div>
+            <div v-if="authStore.authErrors.email"  >
+
+                <span class="text-red-700 text-sm m-2 p-2"> {{ authStore.authErrors.email[0] }}</span>
             </div>
           </div>
 
@@ -55,11 +35,14 @@ const handleLogin = async () => {
             <div class="flex items-center justify-between">
               <label for="password" class="block text-sm font-medium leading-6 text-gray-900">Password</label>
               <div class="text-sm">
-                <a href="#" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</a>
+                <router-link :to="{name:'ForgotPsasword'}" class="font-semibold text-indigo-600 hover:text-indigo-500">Forgot password?</router-link>
               </div>
             </div>
             <div class="mt-2">
-              <input id="password" v-model="form.password" name="password" type="password" autocomplete="current-password" required="" class="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+              <input id="password" placeholder="Password: "  v-model="form.password" name="password" type="password" autocomplete="current-password"  class="block p-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
+            </div>
+            <div v-if="authStore.authErrors.password"  >
+                <span  class="text-red-700 text-sm m-2 p-2"> {{ authStore.authErrors.password[0] }}</span>
             </div>
           </div>
 
