@@ -39,5 +39,7 @@ Route::middleware(['auth:sanctum',])->prefix('v1')->group(function () {
         Route::get('categories', [PostCategorController::class, 'getAllCategorInPost']);
     });
     Route::get('tags/{tag}/post', [PostTagController::class, 'getAllPostInTags']);
+    Route::get('user/{user}/post', [PostController::class, 'getPostInUser']);
+
     Route::get('categories/{category}/posts', [PostCategorController::class, 'getAllPostInCategors']);
 });

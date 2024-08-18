@@ -12,12 +12,12 @@ class PostCategorController extends Controller
     //
     public function getAllPostInCategors(Category $category){
         // dd($tag);
-        $posts = $category->posts()->get()->load("user");;
-        return response()->json(["message"=>"Success response","posts"=>$posts]);
+        $posts = $category->posts()->get()->load(["user","category",'user.roles']);;
+        return response()->json(["posts"=>$posts]);
     }
     public function getAllCategorInPost(Post $post){
 
         $categors = $post->category()->get();
-        return response()->json(["message"=>"Success response","categors"=>$categors]);
+        return response()->json(["categors"=>$categors]);
     }
 }

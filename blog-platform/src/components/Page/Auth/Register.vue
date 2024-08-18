@@ -26,8 +26,8 @@
             <div class="mt-2">
               <input id="username"  name="username" type="text" v-model="form.name" autocomplete="username"  placeholder="User Name" class="block p-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
             </div>
-            <div v-if="authStore.authErrors.name"  >
-                <span class="text-red-700 text-sm m-2 p-2"> {{ authStore.authErrors.name[0] }}</span>
+            <div v-if="authStore.erroes.name"  >
+                <span class="text-red-700 text-sm m-2 p-2"> {{ authStore.erroes.name[0] }}</span>
             </div>
           </div>
           <div>
@@ -35,8 +35,8 @@
             <div class="mt-2">
               <input id="email" name="email" type="email"  v-model="form.email" autocomplete="email"  placeholder="Email Address"  class="block  p-2  w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
             </div>
-            <div v-if="authStore.authErrors.email"  >
-                <span class="text-red-700 text-sm m-2 p-2"> {{ authStore.authErrors.email[0] }}</span>
+            <div v-if="authStore.erroes.email"  >
+                <span class="text-red-700 text-sm m-2 p-2"> {{ authStore.erroes.email[0] }}</span>
             </div>
           </div>
 
@@ -47,8 +47,8 @@
             <div class="mt-2">
               <input id="password" name="password"  v-model="form.password" type="password" placeholder="password" autocomplete="current-password"  class="block p-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
             </div>
-            <div v-if="authStore.authErrors.password"  >
-                <span  class="text-red-700 text-sm m-2 p-2"> {{ authStore.authErrors.password[0] }}</span>
+            <div v-if="authStore.erroes.password"  >
+                <span  class="text-red-700 text-sm m-2 p-2"> {{ authStore.erroes.password[0] }}</span>
             </div>
           </div>
           <div>

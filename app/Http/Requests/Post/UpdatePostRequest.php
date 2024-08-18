@@ -26,10 +26,11 @@ class UpdatePostRequest extends FormRequest
      */
     public function rules(): array
     {
+
         return [
             //
-            'title' => 'required|min:3|string|max:255',
-            'content' => 'required|min:3|string|max:255',
+            'title' => 'required|min:3|string|max:50',
+            'content' => 'required|min:100|string|max:3000',
             'category_id' => 'required|exists:categories,id',
             "tags"=>"array",
             'tags.*' => 'exists:tags,id'
@@ -39,8 +40,12 @@ class UpdatePostRequest extends FormRequest
     {
         return [
             'title.required' => 'The title field is required',
+            'title.max' => 'The title must be between 3 and 50 characters',
+            'title.min' => 'The title must be between 3 and 50 characters',
             'content.required' => 'The content field is required',
-            'category_id.required' => 'The category_id field is required',
+            'content.max' => 'The content must be between 100 and 3000 characters',
+            'content.min' => 'The content must be between 100 and 3000 characters',
+            'category_id.required' => 'The category field is required',
             'category_id.exists' => 'The category  is note exists',
         ];
     }

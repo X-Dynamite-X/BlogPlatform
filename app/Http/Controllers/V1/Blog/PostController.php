@@ -1,8 +1,8 @@
 <?php
-
 namespace App\Http\Controllers\V1\Blog;
 
 use App\Models\Post;
+use App\Models\User;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\StorePostRequest;
@@ -12,59 +12,47 @@ class PostController extends Controller
 {
     public function index()
     {
-        $posts = Post::all()->load("user");
+        $posts = Post::with(["user","category","tags",'user.roles'])->get();
         return response()->json([
-            'message' => 'Posts fetched successfully',
             'posts' => $posts,
         ]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
+    public function getPostInUser(User $user)
+    {
+        $allPostInUser =  $user->posts()->with(["category","tags","user.roles"])->get();
+        return response()->json([
+            'allPostInUser' => $allPostInUser,
+        ]);
+    }
+
     public function store(StorePostRequest $request)
     {
         $data = $request->safe()->merge(['user_id' => auth()->id()]);
         $post = Post::create($data->all());
-        // dd();
         $post->tags()->sync($request->tags);
         return response()->json([
-            'message' => 'Post created successfully',
             'post' => $post,
         ]);
     }
 
-    /**
-     * Display the specified resource.
-     */
     public function show(Post $post)
     {
-        // $post = $post->where("id","=",$post->id)->with(["category","tags"])->get();
-        // dd($post);
+        $post->load(["category","user","tags",'user.roles']);
         return response()->json([
-            'message' => 'Post fetched successfully',
-            'post' => $post->load(["category","user","tags"]),
-            "auth"=>auth()->user(),
-
+            'post' => $post,
         ]);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
     public function update(UpdatePostRequest $request, Post $post)
     {
         $post->update($request->validated());
         $post->tags()->sync($request->tags);
         return response()->json([
-            'message' => 'Post updated successfully',
             'post' => $post,
         ]);
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
     public function destroy(Post $post)
     {
         if (auth()->id() !== $post->user_id) {

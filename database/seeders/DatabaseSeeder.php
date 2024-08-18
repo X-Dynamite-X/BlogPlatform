@@ -18,20 +18,36 @@ class DatabaseSeeder extends Seeder
 
     public function run(): void
     {
-        $user = User::create([
-            "name"=>"dynamite",
-            "email"=> "dynamite@gmail.com",
-            "password"=>Hash::make("123"),
-        ]);
         $roles =['admin', 'author', 'user'];
         foreach ($roles as $role) {
             # code...
             $role = Role::create(['name' => $role]);
         }
+        $user = User::create([
+            "name"=>"dynamite",
+            "email"=> "dynamite@gmail.com",
+            "password"=>Hash::make("123"),
+        ]);
         $user->assignRole('admin');
+        $user = User::create([
+            "name"=>"madara",
+            "email"=> "madara@gmail.com",
+            "password"=>Hash::make("123"),
+        ]);
+        $user->assignRole('author');
+
+        $user = User::create([
+            "name"=>"mozan",
+            "email"=> "mozan@gmail.com",
+            "password"=>Hash::make("123"),
+        ]);
+        $user->assignRole('user');
+
+
         $this->call([
             CategorySeeder::class,
             TagSeeder::class,
+            PostSeeder::class,
         ]);
     }
 }

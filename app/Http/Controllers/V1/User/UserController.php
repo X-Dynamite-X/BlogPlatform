@@ -33,6 +33,9 @@ class UserController extends Controller
     public function show(User $user)
     {
         //
+        $profile= $user->load('roles');
+        // $profile="test";
+        return response()->json(["profile"=>$profile]);
     }
 
     /**
@@ -40,7 +43,21 @@ class UserController extends Controller
      */
     public function update(Request $request, User $user)
     {
-        //
+        // Validate the request data
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|unique:users,email,' . $user->id,
+            // Add other fields that need validation
+        ]);
+
+        // Update the user with validated data
+        $user->update($validatedData);
+
+        // Return a success response with the updated user data
+        return response()->json([
+            "message" => "Profile updated successfully",
+            "user" => $user,
+        ]);
     }
 
     /**

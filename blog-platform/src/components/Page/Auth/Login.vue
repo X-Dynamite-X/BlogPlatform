@@ -3,7 +3,6 @@
     import { useAuthStore } from '../../../stores/auth';
     const  authStore = useAuthStore();
     const login = authStore.handleLogin
-    const errors =authStore.authErrors
     const form = ref({
         email: "",
         password: "",
@@ -25,9 +24,9 @@
             <div class="mt-2">
               <input id="email" placeholder="Email Address : " v-model="form.email" name="email" type="email" autocomplete="email" class="block p-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
             </div>
-            <div v-if="authStore.authErrors.email"  >
+            <div v-if="authStore.erroes.email"  >
 
-                <span class="text-red-700 text-sm m-2 p-2"> {{ authStore.authErrors.email[0] }}</span>
+                <span class="text-red-700 text-sm m-2 p-2"> {{ authStore.erroes.email[0] }}</span>
             </div>
           </div>
 
@@ -41,8 +40,8 @@
             <div class="mt-2">
               <input id="password" placeholder="Password: "  v-model="form.password" name="password" type="password" autocomplete="current-password"  class="block p-2 w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6" />
             </div>
-            <div v-if="authStore.authErrors.password"  >
-                <span  class="text-red-700 text-sm m-2 p-2"> {{ authStore.authErrors.password[0] }}</span>
+            <div v-if="authStore.erroes.password"  >
+                <span  class="text-red-700 text-sm m-2 p-2"> {{ authStore.erroes.password[0] }}</span>
             </div>
           </div>
 
