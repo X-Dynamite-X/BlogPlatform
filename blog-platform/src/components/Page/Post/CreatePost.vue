@@ -1,11 +1,11 @@
 <script setup>
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, nextTick } from "vue";
 import { usePostStore } from "../../../stores/post";
 import Quill from "quill";
 import "quill/dist/quill.snow.css";
 
-// استخدام المتجر للحصول على البيانات
 const postStore = usePostStore();
+const isLoading = ref(false);
 
 // تعريف النموذج الخاص بالبيانات المدخلة
 const form = ref({
@@ -18,21 +18,29 @@ const dropdownOpen = ref(false);
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value;
 };
+
 const categories = computed(() => postStore.categories);
 const tags = computed(() => postStore.tags);
 const selectedTagsText = computed(() => {
   return form.value.tags.length
     ? tags.value
-        .filter(tag => form.value.tags.includes(tag.id))
-        .map(tag => tag.name)
+        .filter((tag) => form.value.tags.includes(tag.id))
+        .map((tag) => tag.name)
         .join(", ")
     : "Select tags";
 });
+
 const editor = ref(null);
 onMounted(async () => {
+  isLoading.value = true;
   await postStore.getAllTag();
   await postStore.getAllCategory();
+  isLoading.value = false;
 
+  // انتظر حتى يتم تحميل الـ DOM
+  await nextTick();
+
+  // تهيئة محرر Quill بعد أن يتم تحميل العنصر
   editor.value = new Quill("#editor", {
     theme: "snow",
     modules: {
@@ -47,20 +55,24 @@ onMounted(async () => {
   });
 
   // ربط محتوى المحرر بحقل المحتوى في النموذج
-  editor.value.on('text-change', () => {
+  editor.value.on("text-change", () => {
     form.value.content = editor.value.root.innerHTML;
   });
 });
+
 const submitForm = () => {
-    form.value.content = editor.value.root.innerHTML;  // Access the content of the Quill editor here
-    postStore.createPost(form.value);
+  form.value.content = editor.value.root.innerHTML; // الحصول على المحتوى من محرر Quill
+  postStore.createPost(form.value);
 };
 
 
 </script>
 
 <template>
-  <div class="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg mt-10">
+    <div v-if="isLoading" class="flex justify-center items-center h-screen">
+  <div class="loader"></div>
+</div>
+  <div v-else class="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg mt-10">
     <h2 class="text-2xl font-semibold text-gray-900 mb-6">Create a New Post</h2>
     <form @submit.prevent="submitForm" method="post">
       <!-- حقل إدخال العنوان -->

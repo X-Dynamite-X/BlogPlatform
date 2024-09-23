@@ -1,23 +1,27 @@
 <script setup>
-import { onMounted, computed } from "vue";
+import { onMounted, ref ,computed } from "vue";
 import { useAuthStore } from "../../../stores/auth";
 import { usePostStore } from "../../../stores/post";
 import { useRoute } from "vue-router";
 const route = useRoute();
 const authStore = useAuthStore();
 const postStore = usePostStore();
+const isLoading = ref(false)
 
 // Fetch the user profile when the component is mounted
 onMounted(async () => {
-  await authStore.getProfile(authStore.user.id);
+//   await authStore.getProfile(authStore.user.id);
+isLoading.value =true
   await postStore.getAllPostInUser(authStore.user.id);
+  isLoading.value =false
+
 });
 
 // Compute the initials based on the user's name
 const initials = computed(() => {
 
-  return authStore.profile?.name
-    ? authStore.profile.name.charAt(0).toUpperCase()
+  return authStore.user?.name
+    ? authStore.user.name.charAt(0).toUpperCase()
     : "";
 });
 function formatDateTime(dateString) {
@@ -30,8 +34,11 @@ function truncatedContent(content) {
 </script>
 
 <template>
+    <div v-if="isLoading" class="flex justify-center items-center h-screen">
+  <div class="loader"></div>
+</div>
   <div
-    v-if="authStore.profile"
+    v-else
     class="max-w-4xl mx-auto p-8 bg-white rounded-lg shadow-lg mt-10"
   >
     <!-- Profile Header -->
@@ -45,12 +52,12 @@ function truncatedContent(content) {
         </div>
         <div>
           <h1 class="text-2xl font-semibold text-gray-900">
-            {{ authStore.profile.name }}
+            {{ authStore.user.name }}
           </h1>
-          <p class="text-gray-600">{{ authStore.profile.email }}</p>
+          <p class="text-gray-600">{{ authStore.user.email }}</p>
           <div class="mt-2">
             <span
-              v-for="role in authStore.profile.roles"
+              v-for="role in authStore.user.roles"
               :key="role.id"
               class="bg-blue-100 text-blue-800 text-sm font-medium mr-2 px-2.5 py-0.5 rounded-full"
             >
@@ -74,7 +81,7 @@ function truncatedContent(content) {
     <!-- Social Links -->
     <div class="mt-6 py-4">
       <h2 class="text-lg font-semibold text-gray-900">
-        Connect with {{ authStore.profile.name }}
+        Connect with {{ authStore.user.name }}
       </h2>
       <div class="flex space-x-4 mt-2">
         <a href="#" class="text-gray-500 hover:text-blue-600">
@@ -311,7 +318,5 @@ function truncatedContent(content) {
     </div>
   </div></div>
   <!-- Loading State or Error Handling -->
-  <div v-if="!authStore.profile" class="text-center mt-10">
-    <p>Loading profile data...</p>
-  </div>
+
 </template>

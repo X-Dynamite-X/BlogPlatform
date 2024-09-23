@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watchEffect } from "vue";
+import { onMounted,ref, watchEffect } from "vue";
 import { useAuthStore } from "../../../stores/auth";
 import { usePostStore } from "../../../stores/post";
 import { useRoute } from "vue-router";
@@ -11,9 +11,14 @@ const categoryId = route.query.categoryId;
 
 
 
+const isLoading = ref(false)
 onMounted(async () => {
+    isLoading.value =true
+
   await authStore.getUser();
   await postStore.getAllPostInCategory(categoryId);
+  isLoading.value =false
+
 });
 
 watchEffect(async () => {
@@ -29,7 +34,11 @@ function truncatedContent(content) {
 </script>
 
 <template>
+
   <template v-if="authStore.user">
+    <div v-if="isLoading" class="flex justify-center items-center h-screen">
+  <div class="loader"></div>
+</div>
     <div class="bg-white py-12 sm:py-16">
       <div class="mx-auto max-w-7xl px-6 lg:px-8">
         <div class="mx-auto max-w-2xl lg:mx-0">

@@ -11,8 +11,9 @@ class UpdateCommentRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        
-        return auth()->id() === $this->comment->user_id;
+
+        return auth()->user()->id === $this->comment->user->id;
+    
     }
 
     /**

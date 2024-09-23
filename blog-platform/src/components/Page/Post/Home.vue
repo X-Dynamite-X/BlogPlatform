@@ -1,12 +1,19 @@
 <script setup>
-import { onMounted, watchEffect } from "vue";
+import { onMounted, ref, watchEffect } from "vue";
 import { usePostStore } from "../../../stores/post";
+import { useAuthStore } from "../../../stores/auth";
+
 import { useRoute } from "vue-router";
 const route = useRoute();
 const postStore = usePostStore();
+const authStore = useAuthStore();
+const isLoading = ref(false)
 // const user = authStore.user
 onMounted(async () => {
-  await postStore.getAllPost();
+    isLoading.value =true
+    await postStore.getAllPost();
+    isLoading.value =false
+
 });
 function formatDateTime(dateString) {
   const date = new Date(dateString);
@@ -18,6 +25,10 @@ function truncatedContent(content) {
 </script>
 
 <template>
+<div v-if="isLoading" class="flex justify-center items-center h-screen">
+  <div class="loader"></div>
+</div>
+
 
       <div class="bg-white py-12 sm:py-16">
         <div class="mx-auto max-w-7xl px-6 lg:px-8">
@@ -96,6 +107,8 @@ function truncatedContent(content) {
       </div>
 
       <!-- Create Post Button - Fixed to Bottom -->
+        <div v-if="authStore.user.roles[0].name == 'author'  || authStore.user.roles[0].name == 'admin'">
+
       <router-link :to="{ name: 'createPost' }">
         <button
           class="fixed bottom-4 right-4 flex items-center justify-center w-12 h-12 bg-blue-600 text-white rounded-full shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
@@ -117,4 +130,6 @@ function truncatedContent(content) {
           </svg>
         </button>
       </router-link>
-  </template>
+    </div>
+
+</template>

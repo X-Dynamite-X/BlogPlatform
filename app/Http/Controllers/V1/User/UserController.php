@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\v1\User;
 
-use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Controller;
 
 class UserController extends Controller
 {
@@ -15,7 +15,8 @@ class UserController extends Controller
     {
         //
         // dd(auth()->user());
-        $user = auth()->user();
+        $user = auth();
+        // dd($user);
         return response()->json(["usre"=>$user,]);
     }
 
@@ -53,6 +54,19 @@ class UserController extends Controller
         // Update the user with validated data
         $user->update($validatedData);
 
+        // Return a success response with the updated user data
+        return response()->json([
+            "message" => "Profile updated successfully",
+            "user" => $user,
+        ]);
+    }
+    public function updateAuth(Request $request)
+    {
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+        $user = auth()->user();
+        $user->update($validatedData);
         // Return a success response with the updated user data
         return response()->json([
             "message" => "Profile updated successfully",

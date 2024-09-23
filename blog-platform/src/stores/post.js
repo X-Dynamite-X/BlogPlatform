@@ -11,6 +11,7 @@ export const usePostStore = defineStore("post", {
     postStatus: null,
     allTag: [],
     allCategory: [],
+    allComment: [],
 
   }),
   getters: {
@@ -21,7 +22,7 @@ export const usePostStore = defineStore("post", {
     tags: (satae) => satae.allTag,
     categories: (satae) => satae.allCategory,
     errors : (satae) => satae.postErrors,
-
+    comments : (satae) =>satae.allComment
   },
   actions: {
     async getAllPost() {
@@ -53,6 +54,8 @@ export const usePostStore = defineStore("post", {
       try {
         const response = await axios.get(`api/v1/post/${postId}`);
         this.dataPost = response.data.post;
+        console.log(this.dataPost);
+
       } catch (error) {}
     },
     async getUserPosts(userId) {
@@ -149,17 +152,46 @@ export const usePostStore = defineStore("post", {
     },
     async deletePost(postId){
         console.log(postId);
-
         try{
-
             await axios.delete(`/api/v1/post/${postId}`, );
             this.router.push("/")
         }
         catch(error){
             console.log(error);
+        }
+    },
+    async addComment(postId,content){
+        console.log(content);
+        try{
+            const response = await axios.post(`/api/v1/posts/${postId}/comments`, {content});
+            this.dataPost.comments.push(response.data.comment)
+        }
+        catch(error){
+            console.log(error.response.data);
+        }
+    },
+    async editComment(postId,commentId,content){
+        console.log(postId);
+        console.log(commentId);
+        console.log(content);
+        try{
+            const response= await axios.put(`/api/v1/posts/${postId}/comments/${commentId}`, {content});
+            console.log(response);
 
         }
-    }
+        catch(error){
+            console.log(error.response.data.message);
+        }
+    },
+    async destroyComment(postId,commentId){
+        try{
+            const response = await axios.delete(`/api/v1/posts/${postId}/comments/${commentId}`);
+            console.log(response.data.message);
 
+        }
+        catch(error){
+            console.log(error.response.data.message);
+        }
+    }
   },
 });

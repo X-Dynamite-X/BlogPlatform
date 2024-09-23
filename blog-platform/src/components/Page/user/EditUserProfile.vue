@@ -7,6 +7,7 @@ const authStore = useAuthStore();
 // Create refs for the form fields
 const name = ref("");
 const email = ref("");
+const isLoading = ref(false)
 
 // const socialLinks = ref({
 //   facebook: "",
@@ -17,9 +18,11 @@ const email = ref("");
 
 // Fetch the user's profile data on component mount
 onMounted(async () => {
-    await authStore.getProfile(authStore.user.id);
-    name.value = authStore.profile.name;
-    email.value = authStore.profile.email;
+    isLoading.value =true
+    name.value = authStore.user.name;
+    email.value = authStore.user.email;
+    isLoading.value =false
+
   // If you have social links stored in the profile, load them here
   // socialLinks.value = authStore.profile.socialLinks;
 });
@@ -29,12 +32,11 @@ const saveProfile = async () => {
   // Construct the payload
   const payload = {
     name: name.value,
-    email: email.value,
     // socialLinks: socialLinks.value
   };
 
   // Send the payload to the server
-  await authStore.updateProfile(authStore.user.id, payload);
+  await authStore.updateProfile( payload);
 };
 </script>
 
@@ -49,7 +51,10 @@ const saveProfile = async () => {
         <label for="name" class="block text-sm font-medium text-gray-700">Name</label>
         <input v-model="name" type="text" id="name" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm" />
       </div>
+      <div v-if="authStore.erroes.name"  >
 
+    <span class="text-red-700 text-sm m-2 p-2"> {{ authStore.erroes.name[0] }}</span>
+    </div>
       <!-- Email -->
       <div class="mb-4">
         <label for="email" class="block text-sm font-medium text-gray-700">Email</label>

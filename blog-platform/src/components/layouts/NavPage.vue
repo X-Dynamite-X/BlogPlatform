@@ -6,7 +6,6 @@
 
     const authStore = useAuthStore();
     const logout = authStore.handleLogout
-
     const initials = computed(() => {
 
 return authStore.user?.name
@@ -40,6 +39,10 @@ return authStore.user?.name
                 </template>
                 <template v-else>
                     <router-link class='text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' :to="{name : 'home'}" >Home</router-link>
+
+                    <router-link v-if="authStore.user.roles[0].name === 'admin'"
+                    class='text-gray-300 hover:bg-gray-700 hover:text-white rounded-md px-3 py-2 text-sm font-medium' :to="{name : 'adminHome'}" >Admin</router-link>
+
                 </template>
 
               </div>
@@ -94,6 +97,7 @@ return authStore.user?.name
             </template>
             <template v-else>
                 <router-link class='text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium' :to="{name : 'home'}" >Home</router-link>
+                <router-link class='text-gray-300 hover:bg-gray-700 hover:text-white block rounded-md px-3 py-2 text-base font-medium' :to="{name : 'adminHome'}" >Admin</router-link>
             </template>
         </div>
       </DisclosurePanel>

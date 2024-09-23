@@ -1,17 +1,18 @@
 
 <script setup>
-import { onMounted, ref, computed } from 'vue';
+import { onMounted, ref, computed, nextTick } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { usePostStore } from '../../../stores/post';
 import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 
-// Initialize stores and route
+// تهيئة المسارات والمتاجر
 const route = useRoute();
 const router = useRouter();
 const postStore = usePostStore();
+const isLoading = ref(false);
 
-// Initialize form data
+// تهيئة بيانات النموذج
 const form = ref({
   title: '',
   content: '',
@@ -19,16 +20,20 @@ const form = ref({
   tags: [],
 });
 
-// State for dropdown
+// حالة القائمة المنسدلة
 const dropdownOpen = ref(false);
 
-// Reference for the Quill editor
+// مرجع لمحرر Quill
 const editor = ref(null);
 
-// Load post data and categories/tags on component mount
+// تحميل بيانات المشاركة والفئات/العلامات عند تحميل المكون
 onMounted(async () => {
+  isLoading.value = true;
+
   const postId = route.query.postId;
   await postStore.getPost(postId);
+  isLoading.value = false;
+
   form.value = {
     title: postStore.post.title,
     content: postStore.post.content,
@@ -36,42 +41,44 @@ onMounted(async () => {
     tags: postStore.post.tags.map(tag => tag.id),
   };
 
-  // Initialize Quill editor and assign it to the `editor` ref
-  editor.value = new Quill('#editor', {
-    theme: 'snow',
-    modules: {
-      toolbar: [
-        [{ header: [1, 2, 3, 4, 5, 6, false] }],
-        ['bold', 'italic', 'underline', 'strike'],
-        [{ color: [] }, { background: [] }],
-        [{ list: 'ordered' }, { list: 'bullet' }],
-        ['link', 'image'],
-      ],
-    },
-  });
+  // استخدم nextTick لضمان تحميل المحرر بالكامل قبل تهيئة Quill
+  await nextTick(() => {
+    editor.value = new Quill('#editor', {
+      theme: 'snow',
+      modules: {
+        toolbar: [
+          [{ header: [1, 2, 3, 4, 5, 6, false] }],
+          ['bold', 'italic', 'underline', 'strike'],
+          [{ color: [] }, { background: [] }],
+          [{ list: 'ordered' }, { list: 'bullet' }],
+          ['link', 'image'],
+        ],
+      },
+    });
 
-  // Set the initial content of the editor
-  editor.value.root.innerHTML = form.value.content;
+    // إعداد المحتوى المبدئي للمحرر
+    editor.value.root.innerHTML = form.value.content;
 
-  // Update content in form on editor change
-  editor.value.on('text-change', () => {
-    form.value.content = editor.value.root.innerHTML;
+    // تحديث المحتوى في النموذج عند تغيير المحرر
+    editor.value.on('text-change', () => {
+      form.value.content = editor.value.root.innerHTML;
+    });
   });
 
   await postStore.getAllTag();
   await postStore.getAllCategory();
 });
 
-// Computed properties for categories and tags
+// الخصائص المحسوبة للفئات والعلامات
 const categories = computed(() => postStore.categories);
 const tags = computed(() => postStore.tags);
 
-// Toggle dropdown
+// تبديل القائمة المنسدلة
 const toggleDropdown = () => {
   dropdownOpen.value = !dropdownOpen.value;
 };
 
-// Generate selected tags text
+// توليد نص العلامات المحددة
 const selectedTagsText = computed(() => {
   return form.value.tags.length
     ? tags.value
@@ -81,17 +88,21 @@ const selectedTagsText = computed(() => {
     : 'Select tags';
 });
 
-// Submit form function
+// دالة إرسال النموذج
 async function submitForm() {
-  // Access the content of the Quill editor through `editor.value`
+  // الوصول إلى محتوى محرر Quill من خلال `editor.value`
   form.value.content = editor.value.root.innerHTML;
 
   await postStore.updatePost(form.value, route.query.postId);
 }
 </script>
 
+
 <template>
-    <div class="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg mt-10">
+    <div v-if="isLoading" class="flex justify-center items-center h-screen">
+  <div class="loader"></div>
+</div>
+    <div v-else class="max-w-2xl mx-auto p-8 bg-white rounded-lg shadow-lg mt-10">
       <h2 class="text-2xl font-semibold text-gray-900 mb-6">Edit Post</h2>
       <form @submit.prevent="submitForm" method="post">
         <!-- Title Input Field -->

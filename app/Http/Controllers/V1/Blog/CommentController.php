@@ -58,14 +58,19 @@ class CommentController extends Controller
      */
     public function updateForPost(Post $post, UpdateCommentRequest $request, Comment $comment)
     {
-        $this->authorize('update', $comment);
+        if( auth()->user()->id === $comment->user_id){
 
         $comment->update($request->validated());
 
         return response()->json([
             'message' => 'Comment updated successfully',
             'comment' => $comment->load('user'),
-        ]);
+        ]);}
+        else{
+            return response()->json([
+                'message' => 'This action is unauthorized',
+                ],403);
+        }
     }
 
     /**
@@ -73,15 +78,17 @@ class CommentController extends Controller
      */
     public function destroyForPost(Post $post, Comment $comment)
     {
-        $this->authorize('delete', $comment);
+        if( auth()->user()->id === $comment->user_id){
 
-        $comment->delete();
-
-        $comments = $post->comments()->with('user')->get();
+            $comment->delete();
 
         return response()->json([
             'message' => 'Comment deleted successfully',
-            'comments' => $comments,
-        ]);
+        ]);}
+        else{
+            return response()->json([
+                'message' => 'This action is unauthorized',
+                ],403);
+        }
     }
 }

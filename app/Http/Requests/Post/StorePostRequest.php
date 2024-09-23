@@ -11,7 +11,8 @@ class StorePostRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return true;
+        // return true;
+        return auth()->user()->hasRole(["admin","author"]);
     }
 
     /**
@@ -24,7 +25,7 @@ class StorePostRequest extends FormRequest
 
         return [
             //
-            'title' => 'required|min:3|string|max:50',
+            'title' => 'required|min:3|string|max:100',
             'content' => 'required|min:100|string|max:3000',
             'category_id' => 'required|exists:categories,id',
             "tags"=>"array",
@@ -35,8 +36,8 @@ class StorePostRequest extends FormRequest
     {
         return [
             'title.required' => 'The title field is required',
-            'title.max' => 'The title must be between 3 and 50 characters',
-            'title.min' => 'The title must be between 3 and 50 characters',
+            'title.max' => 'The title must be between 3 and 100 characters',
+            'title.min' => 'The title must be between 3 and 100 characters',
             'content.required' => 'The content field is required',
             'content.max' => 'The content must be between 100 and 3000 characters',
             'content.min' => 'The content must be between 100 and 3000 characters',

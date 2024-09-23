@@ -11,11 +11,6 @@ use Spatie\Permission\Models\Permission;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
-#            $table->enum('role', ['admin', 'author', 'user'])->default('user');
-
     public function run(): void
     {
         $roles =['admin', 'author', 'user'];
@@ -35,7 +30,6 @@ class DatabaseSeeder extends Seeder
             "password"=>Hash::make("123"),
         ]);
         $user->assignRole('author');
-
         $user = User::create([
             "name"=>"mozan",
             "email"=> "mozan@gmail.com",
@@ -44,10 +38,15 @@ class DatabaseSeeder extends Seeder
         $user->assignRole('user');
 
 
+
         $this->call([
+
             CategorySeeder::class,
             TagSeeder::class,
             PostSeeder::class,
+            CommentSeeder::class,
+            UserSeeder::class,
+
         ]);
     }
 }

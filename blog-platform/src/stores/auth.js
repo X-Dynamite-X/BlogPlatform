@@ -4,14 +4,12 @@ import axios from "axios"
 export const useAuthStore = defineStore('auth', {
     state: () => ({
         authUser:null,
-        profileUser:null,
         authErrors:[],
         authStatus:null,
 
     }),
     getters : {
         user : (satae) => satae.authUser,
-        profile :(satae) => satae.profileUser,
         erroes : (satae) => satae.authErrors,
         status : (satae) => satae.authStatus,
 
@@ -26,7 +24,6 @@ export const useAuthStore = defineStore('auth', {
             try {
                 const data = await axios.get("/api/user");
                 this.authUser = data.data;
-                console.log("test",data);
             } catch (error) {
                 this.authUser = null;
             }
@@ -105,34 +102,18 @@ export const useAuthStore = defineStore('auth', {
                     }
                 }
         },
-        async getProfile(userId){
-            try{
-                const response = await axios.get(`/api/v1/user/${userId}`);
-                this.profileUser = response.data.profile;
-                console.log(this.profileUser);
-                console.log(this.profileUser.roles);
-            }
-            catch(error){
-                console.log(error);
-            }
-        },
 
-        async updateProfile(userId, data) {
+        async updateProfile(data) {
             try {
-                // Make a PUT request to update the user profile
-                const response = await axios.put(`/api/v1/user/${userId}`, data);
-
-                // Assuming you are using Vue Router, this is how you should navigate to the profile page
-                this.router.push('/profile');  // Ensure `$router` is correctly accessible here
-
-                // Update the profileUser with the returned data
-                this.profileUser = response.data.profile;
+                const response = await axios.put(`/api/v1/user/update`, data);
+                this.router.push('/profile');
+                this.authUser = response.data.profile;
             } catch (error) {
-                // Handle the error appropriately (e.g., showing a notification or logging)
                 console.error("Error updating profile:", error);
-                // You could show an error message to the user or handle the error based on the status code
+                if(error.response.status === 422){
+                    this.authErrors = error.response.data.errors;
+                }
             }
         }
-
     }
 });
